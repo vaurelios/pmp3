@@ -27,4 +27,4 @@ Now you can find it in `dist/pmp3.exe`.
 
 License GNU GPLv3
 
-Copyright ₢ 2014 Victor A. Santos <victoraur.santos@gmail.com>
+Copyright © 2014 Victor A. Santos <victoraur.santos@gmail.com>
