@@ -8,7 +8,6 @@ from argparse import ArgumentParser
 from urllib import request
 from hashlib import md5
 
-from bs4 import BeautifulSoup
 from progressbar import ProgressBar, Bar, ReverseBar, ETA
 
 # API urls
