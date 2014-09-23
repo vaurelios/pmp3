@@ -21,7 +21,8 @@ class RemoteFile:
         self.url = ''
         self.dest_name = ''
         self.fnmask = ''
-        self.track_number = 0
+        self.track_number = ''
+        self.n_of = 0
         self.title = ''
         self.artist = ''
         self.data = object()
@@ -36,7 +37,7 @@ class RemoteFile:
         if self.url.startswith('//'):
             self.url = 'http:' + self.url
 
-        self.track_number = int(self.data['ordem']) + 1
+        self.track_number = str(int(self.data['ordem']) + 1).zfill(len(str(self.n_of)))
         self.title = self.data['titulo']
 
         self.dest_name = self.fnmask.format(number=self.track_number, artist=self.artist, title=self.title)
@@ -82,6 +83,7 @@ class PMP3:
             music.artist = self.info['nome']
             music.data = data
             music.fnmask = self.args.fnmask
+            music.n_of = len(self.songs)
             music.pull_data()
             self.musics.append(music)
 
