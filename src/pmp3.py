@@ -10,6 +10,14 @@ from hashlib import md5
 
 from progressbar import ProgressBar, Bar, ReverseBar, ETA
 
+HAVE_TAGLIB = True
+try:
+    import taglib
+except ImportError:
+    HAVE_TAGLIB = False
+    sys.stderr.write("pytaglib library not installed, Write ID3 tags feature not supported!\n")
+    sys.stderr.flush()
+
 # API urls
 API_URL_INFO = 'http://api.palcomp3.com/v1/artists/{artist}/info.json'
 API_URL_ARTIST = 'http://api.palcomp3.com/v1/artists/{artist}/songs.json'
@@ -92,6 +100,20 @@ class PMP3:
 
         self.generes = {}
 
+    def do_write_id3(self, music):
+        if not HAVE_TAGLIB:
+            print("The pytaglib library is not installed, can't write ID3 tags...")
+            pass
+
+        audio = taglib.File(music.dest_name)
+        audio.tags["TITLE"] = music.title
+        audio.tags["ARTIST"] = music.artist
+        audio.tags["ALBUM"] = u"Palco MP3"
+        audio.tags["TRACKNUMBER"] = music.track_number
+        # TODO: support genere
+        #audio.tags["genere"] =
+        audio.save()
+
     def do_download(self):
         self.__sprint("Fetching artist info...")
         self.fetch_info()
@@ -102,7 +124,7 @@ class PMP3:
         self.build_music_list()
 
         for music in self.musics:
-            if (os.path.isfile(music.dest_name)): continue
+            if os.path.isfile(music.dest_name): continue
             with open(music.dest_name, 'wb') as mp3:
                 resp = request.urlopen(music.url)
                 total_size = int(resp.headers['Content-Length'].strip())
@@ -120,6 +142,11 @@ class PMP3:
                     self.__update_progress(mp3.tell(), total_size)
                 self.pbar.finish()
                 self.__sprint('\n')
+
+                if self.args.write_id3:
+                    self.__sprint("Writing ID3 Metadata...")
+                    self.do_write_id3(music)
+                    self.__sprint(" done\n")
 
 
 if __name__ == '__main__':
